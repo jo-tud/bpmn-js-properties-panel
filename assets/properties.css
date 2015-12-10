@@ -31,13 +31,15 @@
 .djs-properties-combo-options-empty {
 }
 
-.djs-listener-area {
+.djs-listener-area,
+.djs-form-field-area {
     border: 1px solid #ccc;
     padding: 0.5em;
     margin: 1em 2px;
 }
 
-.djs-listener-area > h1 {
+.djs-listener-area > h1,
+.djs-form-field-area > h1 {
     margin: -1em -0.5em 0;
 }
 
