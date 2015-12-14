@@ -590,7 +590,7 @@ describe('event-properties', function() {
     expect(escalationEventDefinition.escalationRef.get('escalationCode')).to.be.undefined;
   }));
 
-  it('should fetch name property of a message element',
+  it.only('should fetch name property of a message element',
       inject(function(propertiesPanel, selection, elementRegistry) {
 
     propertiesPanel.attachTo(container);
