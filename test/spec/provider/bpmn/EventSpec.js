@@ -50,7 +50,7 @@ describe('event-properties', function() {
     container.appendChild(undoButton);
   }));
 
-  it('should exist a message definition field to an element with message def',
+  it.only('should exist a message definition field to an element with message def',
       inject(function(propertiesPanel, selection, elementRegistry) {
 
     propertiesPanel.attachTo(container);
