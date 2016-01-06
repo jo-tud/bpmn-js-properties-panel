@@ -50,6 +50,7 @@
     "inherits": "^2.0.1",
     "lodash": "^3.0.1",
     "min-dom": "^0.2.0",
-    "selection-update": "^0.1.2"
+    "selection-update": "^0.1.2",
+    "jquery": "^2.1.1"
   }
 }
