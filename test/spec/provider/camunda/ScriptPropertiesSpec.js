@@ -37,7 +37,7 @@ describe('script-properties', function() {
   }));
 
 
-  beforeEach(inject(function(commandStack) {
+  beforeEach(inject(function(commandStack, propertiesPanel) {
 
     var undoButton = document.createElement('button');
     undoButton.textContent = 'UNDO';
@@ -47,12 +47,13 @@ describe('script-properties', function() {
     });
 
     container.appendChild(undoButton);
+
+    propertiesPanel.attachTo(container);
   }));
+
 
   it('should fetch the inline script properties of a script task',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ScriptTask_1');
     selection.select(shape);
@@ -70,10 +71,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should fetch the external resource script properties of a script task',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ScriptTask_Resource');
     selection.select(shape);
@@ -94,10 +94,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should fill script properties to an empty script task',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ScriptTask_Empty');
     selection.select(shape);
@@ -136,10 +135,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should change the script type from external resource to inline script for a script task',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ScriptTask_Resource');
     selection.select(shape);
@@ -180,16 +178,15 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should remove the result variable value of a script task',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ScriptTask_Resource');
     selection.select(shape);
 
     var scriptResultVariable = domQuery('input[name="scriptResultVariable"]', propertiesPanel._container),
-        clearButton = domQuery('[data-entry=scriptResultVariable] > .field-wrapper > button[data-action=clear]',
+        clearButton = domQuery('[data-entry=scriptResultVariable] > .pp-field-wrapper > button[data-action=clear]',
                                 propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
@@ -206,16 +203,15 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should remove the script format value of a script task',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ScriptTask_1');
     selection.select(shape);
 
     var scriptFormat = domQuery('input[name="scriptFormat"]', propertiesPanel._container),
-        clearButton = domQuery('[data-entry=script-implementation] > .pp-row > .field-wrapper > button[data-action=script\\\.clearScriptFormat]',
+        clearButton = domQuery('[data-entry=script-implementation] > .pp-row > .pp-field-wrapper > button[data-action=script\\\.clearScriptFormat]',
                                 propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
@@ -232,43 +228,15 @@ describe('script-properties', function() {
 
   }));
 
-  it('should not remove the script value of a script task',
+
+  it('should remove the script resource value of a script task',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
-
-    var shape = elementRegistry.get('ScriptTask_1');
-    selection.select(shape);
-
-    var scriptValue = domQuery('textarea[name="scriptValue"]', propertiesPanel._container),
-        clearButton = domQuery('[data-entry=script-implementation] > .pp-row > .field-wrapper > button[data-action=script\\\.clearScript]',
-                                propertiesPanel._container),
-        businessObject = getBusinessObject(shape);
-
-    // given
-    expect(scriptValue.value).to.equal('printf(\'hello world\')');
-    expect(businessObject.get('script')).to.equal(scriptValue.value);
-
-    // when
-    TestHelper.triggerEvent(clearButton, 'click');
-
-    // then
-    expect(scriptValue.value).is.empty;
-    expect(scriptValue.className).to.equal('invalid');
-    expect(businessObject.get('script')).to.equal('printf(\'hello world\')');
-
-  }));
-
-  it('should not remove the script resource value of a script task',
-      inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ScriptTask_Resource');
     selection.select(shape);
 
     var scriptResourceValue = domQuery('input[name="scriptResourceValue"]', propertiesPanel._container),
-        clearButton = domQuery('[data-entry=script-implementation] > .pp-row > .field-wrapper > button[data-action=script\\\.clearScriptResource]',
+        clearButton = domQuery('[data-entry=script-implementation] > .pp-row > .pp-field-wrapper > button[data-action=script\\\.clearScriptResource]',
                                 propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
@@ -282,14 +250,13 @@ describe('script-properties', function() {
     // then
     expect(scriptResourceValue.value).is.empty;
     expect(scriptResourceValue.className).to.equal('invalid');
-    expect(businessObject.get('camunda:resource')).is.not.empty;
+    expect(businessObject.get('camunda:resource')).to.equal('');
 
   }));
 
+
   it('should fetch the external resource script properties of a sequence flow',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('SequenceFlow_5');
     selection.select(shape);
@@ -309,10 +276,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should fetch the inline script properties of a sequence flow',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('SequenceFlow_4');
     selection.select(shape);
@@ -332,10 +298,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should add inline script properties for a sequence flow',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('SequenceFlow_1');
     selection.select(shape);
@@ -348,6 +313,7 @@ describe('script-properties', function() {
 
     // given
     expect(businessObject).not.to.have.property('conditionExpression');
+    expect(businessObject).not.to.have.property('script');
 
     // when
     // select 'script'
@@ -368,10 +334,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should change the script type from external resource to inline script for a sequence flow',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('SequenceFlow_5');
     selection.select(shape);
@@ -412,10 +377,9 @@ describe('script-properties', function() {
 
   }));
 
-  it('should not remove the script format value of a sequence flow',
-      inject(function(propertiesPanel, selection, elementRegistry) {
 
-    propertiesPanel.attachTo(container);
+  it('should remove the script format value of a sequence flow',
+      inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('SequenceFlow_4');
     selection.select(shape);
@@ -435,14 +399,15 @@ describe('script-properties', function() {
     // then
     expect(scriptFormat.value).is.empty;
     expect(scriptFormat.className).to.equal('invalid');
-    expect(businessObject.get('language')).to.equal('groovy');
+
+    businessObject = getBusinessObject(shape).conditionExpression;
+    expect(businessObject.get('language')).to.equal('');
 
   }));
 
+
   it('should fetch the inline script properties of an execution listener',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('StartEvent_1');
     selection.select(shape);
@@ -467,10 +432,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should add inline script properties for an execution listener',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('ServiceTask_1');
     selection.select(shape);
@@ -513,10 +477,9 @@ describe('script-properties', function() {
 
   }));
 
+
   it('should change the script type from inline script to external resource for an execution listener',
       inject(function(propertiesPanel, selection, elementRegistry) {
-
-    propertiesPanel.attachTo(container);
 
     var shape = elementRegistry.get('StartEvent_1');
     selection.select(shape);

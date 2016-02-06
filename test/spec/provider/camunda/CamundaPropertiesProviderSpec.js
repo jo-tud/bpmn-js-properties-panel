@@ -15,7 +15,9 @@ var propertiesPanelModule = require('../../../../lib'),
   propertiesProviderModule = require('../../../../lib/provider/camunda'),
   camundaModdlePackage = require('camunda-bpmn-moddle/resources/camunda');
 
-describe('job-priority', function() {
+
+describe('camunda-properties', function() {
+
   var diagramXML = require('./CamundaPropertiesProvider-JobConfiguration.bpmn');
 
   var testModules = [
@@ -50,20 +52,22 @@ describe('job-priority', function() {
     propertiesPanel.attachTo(container);
   }));
 
+
   it('should hide the job configuration group when all items are hidden or empty',
     inject(function(propertiesPanel, selection, elementRegistry) {
 
-      // given
-      var shape = elementRegistry.get('ServiceTask_1'),
-          selector = '[data-group=jobConfigurationGroup]';
+    // given
+    var shape = elementRegistry.get('ServiceTask_1'),
+        selector = '[data-group=jobConfigurationGroup]';
 
-      // when
-      selection.select(shape);
-      var group = domQuery(selector, propertiesPanel._container);
+    // when
+    selection.select(shape);
+    var group = domQuery(selector, propertiesPanel._container);
 
-      // then
-    expect(domClasses(group).has('hidden')).to.be.true;
+    // then
+    expect(domClasses(group).has('pp-hidden')).to.be.true;
   }));
+
 
   it('should show the job configuration group when there is a non hidden group element',
     inject(function(propertiesPanel, selection, elementRegistry) {
@@ -81,7 +85,7 @@ describe('job-priority', function() {
       var group = domQuery(groupSelector, propertiesPanel._container);
 
       // then
-      expect(domClasses(group).has('hidden')).to.be.false;
-    }));
+      expect(domClasses(group).has('pp-hidden')).to.be.false;
+  }));
 
 });

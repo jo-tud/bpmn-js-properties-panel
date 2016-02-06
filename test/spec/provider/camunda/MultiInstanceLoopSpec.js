@@ -437,6 +437,7 @@ describe('multi-instance-loop-properties', function() {
     expect(businessObject.get('exclusive')).to.be.ok;
   }));
 
+
   it('should hide the exclusive box when disabled',
     inject(function(propertiesPanel, selection, elementRegistry) {
       // given
@@ -448,9 +449,10 @@ describe('multi-instance-loop-properties', function() {
         exclusiveEntry = domQuery('[name=loopExclusive]', propertiesPanel._container);
 
       // then
-      expect(domClasses(exclusiveEntry).has('djs-properties-hide')).to.be.true;
+      expect(domClasses(exclusiveEntry).has('pp-hidden')).to.be.true;
 
     }));
+
 
   it('should show the exclusive box when async before or async after are enabled',
     inject(function(propertiesPanel, selection, elementRegistry) {
@@ -465,9 +467,10 @@ describe('multi-instance-loop-properties', function() {
       TestHelper.triggerEvent(asyncBeforeInput, 'click');
 
       // then
-      expect(domClasses(exclusiveEntry).has('djs-properties-hide')).to.be.false;
+      expect(domClasses(exclusiveEntry).has('pp-hidden')).to.be.false;
 
     }));
+
 
   it('should update if loop markers are toggled',
     inject(function(propertiesPanel, elementRegistry, selection, moddle, modeling) {
@@ -488,7 +491,9 @@ describe('multi-instance-loop-properties', function() {
     expect(loopType).to.exist;
   }));
 
-  it('should fetch a retry time cycle for an element with timer def', inject(function(propertiesPanel, selection, elementRegistry) {
+
+  it('should fetch a retry time cycle for an element with timer def',
+    inject(function(propertiesPanel, selection, elementRegistry) {
 
     // given
     var shape = elementRegistry.get('ServiceTask3'),
@@ -506,7 +511,9 @@ describe('multi-instance-loop-properties', function() {
     expect(retryTimer.get('body')).to.equal('asd');
   }));
 
-  it('should set a retry time cycle for an element with timer def', inject(function(propertiesPanel, selection, elementRegistry) {
+
+  it('should set a retry time cycle for an element with timer def',
+    inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('ServiceTask'),
         inputEl = 'input[name=loopJobRetryTimeCycle]';
@@ -530,7 +537,9 @@ describe('multi-instance-loop-properties', function() {
     expect(retryTimer.get('body')).to.equal('foo');
   }));
 
-  it('should remove a retry time cycle for an element with timer def', inject(function(propertiesPanel, selection, elementRegistry) {
+
+  it('should remove a retry time cycle for an element with timer def',
+    inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('ServiceTask3'),
         inputEl = 'input[name=loopJobRetryTimeCycle]';
@@ -562,6 +571,7 @@ describe('multi-instance-loop-properties', function() {
     expect(inputValue.value).to.equal('');
   }));
 
+
   it('should hide the job retry time cycle field when disabled',
     inject(function(propertiesPanel, selection, elementRegistry) {
       // given
@@ -572,9 +582,10 @@ describe('multi-instance-loop-properties', function() {
       var jobRetryEntry = domQuery('[name=loopJobRetryTimeCycle]', propertiesPanel._container);
 
       // then
-      expect(domClasses(jobRetryEntry.parentElement).has('djs-properties-hide')).to.be.true;
+      expect(domClasses(jobRetryEntry.parentElement).has('pp-hidden')).to.be.true;
 
     }));
+
 
   it('should show the job retry time cycle field when async before or async after are enabled',
     inject(function(propertiesPanel, selection, elementRegistry) {
@@ -589,9 +600,10 @@ describe('multi-instance-loop-properties', function() {
       TestHelper.triggerEvent(asyncBeforeInput, 'click');
 
       // then
-      expect(domClasses(jobRetryEntry.parentElement).has('djs-properties-hide')).to.be.false;
+      expect(domClasses(jobRetryEntry.parentElement).has('pp-hidden')).to.be.false;
 
     }));
+
 
   it('should remove the retryTimeCycle when the element is not async',
     inject(function(propertiesPanel, selection, elementRegistry) {
@@ -614,6 +626,7 @@ describe('multi-instance-loop-properties', function() {
       // then
       expect(newCount + 1).to.equal(extensionElementsCount);
     }));
+
 
   it('should remove the retryTimeCycle and extensionElements list when the element is not async',
     inject(function(propertiesPanel, selection, elementRegistry) {
