@@ -8,6 +8,8 @@ var TestContainer = require('mocha-test-container-support');
 
 var propertiesPanelModule = require('../../../../lib'),
   domQuery = require('min-dom/lib/query'),
+  is = require('bpmn-js/lib/util/ModelUtil').is,
+  forEach = require('lodash/collection/forEach'),
   coreModule = require('bpmn-js/lib/core'),
   selectionModule = require('diagram-js/lib/features/selection'),
   modelingModule = require('bpmn-js/lib/features/modeling'),
@@ -17,7 +19,7 @@ var propertiesPanelModule = require('../../../../lib'),
 
 describe('call-activity-properties', function() {
 
-  var diagramXML = require('./CallActivty.bpmn');
+  var diagramXML = require('./CallActivity.bpmn');
 
   var testModules = [
     coreModule, selectionModule, modelingModule,
@@ -51,6 +53,18 @@ describe('call-activity-properties', function() {
     propertiesPanel.attachTo(container);
   }));
 
+  function getCamundaInWithBusinessKey(extensionElements) {
+    var camundaIn = [];
+    if (extensionElements && extensionElements.values) {
+      forEach(extensionElements.values, function(value) {
+        if (is(value, 'camunda:In') && value.businessKey) {
+          camundaIn.push(value);
+        }
+      });
+    }
+    return camundaIn;
+  }
+
 
   it('should fetch a calledElement field',
       inject(function(propertiesPanel, selection, elementRegistry) {
@@ -61,7 +75,7 @@ describe('call-activity-properties', function() {
     // when
     selection.select(shape);
 
-    var inputField = domQuery('input[name=calledElement]', propertiesPanel._container),
+    var inputField = domQuery('input[name=callableElementRef]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
@@ -78,7 +92,7 @@ describe('call-activity-properties', function() {
     var shape = elementRegistry.get('CallActivity_1');
     selection.select(shape);
 
-    var inputField = domQuery('input[name=calledElement]', propertiesPanel._container);
+    var inputField = domQuery('input[name=callableElementRef]', propertiesPanel._container);
     var businessObject = getBusinessObject(shape);
 
     // given
@@ -99,7 +113,7 @@ describe('call-activity-properties', function() {
     var shape = elementRegistry.get('CallActivity_1');
     selection.select(shape);
 
-    var inputField = domQuery('input[name=calledElement]', propertiesPanel._container);
+    var inputField = domQuery('input[name=callableElementRef]', propertiesPanel._container);
     var businessObject = getBusinessObject(shape);
 
     // given
@@ -118,7 +132,8 @@ describe('call-activity-properties', function() {
       inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('CallActivity_1'),
-        elementSyntax = 'select[name=calledElementBinding]';
+        elementSyntax = 'select[name=callableBinding]';
+
     selection.select(shape);
     var selectedOption = domQuery(elementSyntax, propertiesPanel._container);
 
@@ -130,7 +145,8 @@ describe('call-activity-properties', function() {
       inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('CallActivity_1'),
-        elementSyntax = 'select[name=calledElementBinding]';
+        elementSyntax = 'select[name=callableBinding]';
+
     selection.select(shape);
 
     var selectField = domQuery(elementSyntax, propertiesPanel._container),
@@ -152,7 +168,7 @@ describe('call-activity-properties', function() {
       inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('CallActivity_1'),
-        elementSyntax = 'select[name=calledElementBinding]';
+        elementSyntax = 'select[name=callableBinding]';
 
     selection.select(shape);
 
@@ -178,7 +194,8 @@ describe('call-activity-properties', function() {
       inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('CallActivity_1'),
-        elementSyntax = 'input[name=calledElementVersion]';
+        elementSyntax = 'input[name=callableVersion]';
+
     selection.select(shape);
 
     var inputField = domQuery(elementSyntax, propertiesPanel._container);
@@ -193,7 +210,8 @@ describe('call-activity-properties', function() {
       inject(function(propertiesPanel, selection, elementRegistry) {
 
     var shape = elementRegistry.get('CallActivity_1'),
-        elementSyntax = 'input[name=calledElementVersion]';
+        elementSyntax = 'input[name=callableVersion]';
+
     selection.select(shape);
 
     var inputField = domQuery(elementSyntax, propertiesPanel._container);
@@ -217,7 +235,7 @@ describe('call-activity-properties', function() {
 
     selection.select(shape);
 
-    var inputField = domQuery('input[name=calledElementVersion]', propertiesPanel._container),
+    var inputField = domQuery('input[name=callableVersion]', propertiesPanel._container),
       businessObject = getBusinessObject(shape);
 
     // given
@@ -242,7 +260,7 @@ describe('call-activity-properties', function() {
     selection.select(shape);
 
     var businessObject = getBusinessObject(shape),
-        elementSyntax = 'select[name=calledElementBinding]';
+        elementSyntax = 'select[name=callableBinding]';
 
     var selectedOption = domQuery(elementSyntax, propertiesPanel._container);
 
@@ -262,18 +280,18 @@ describe('call-activity-properties', function() {
     selection.select(shape);
 
     // then
-    var caseRefInput = domQuery('input[name=caseRef]', propertiesPanel._container),
-        caseBindingSelect = domQuery('select[name=caseBinding]', propertiesPanel._container),
-        versionInput = domQuery('input[name=caseVersion]', propertiesPanel._container),
+    var callabledElementRefInput = domQuery('input[name=callableElementRef]', propertiesPanel._container),
+        callableBindingSelect = domQuery('select[name=callableBinding]', propertiesPanel._container),
+        versionInput = domQuery('input[name=callableVersion]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     expect(callActivityTypeSelect.value).to.equal('cmmn');
-    expect(caseRefInput.value).to.equal('checkCreditCase');
-    expect(caseBindingSelect.value).to.equal('latest');
-    expect(versionInput.parentElement.parentElement.className).to.contains('pp-hidden');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(callabledElementRefInput.value).to.equal('checkCreditCase');
+    expect(callableBindingSelect.value).to.equal('latest');
+    expect(versionInput.parentElement.className).to.contains('pp-hidden');
+    expect(businessObject.get('camunda:caseRef')).to.equal(callabledElementRefInput.value);
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
 
   }));
@@ -285,21 +303,21 @@ describe('call-activity-properties', function() {
     var shape = elementRegistry.get('CallActivity_3');
     selection.select(shape);
 
-    var caseRefInput = domQuery('input[name=caseRef]', propertiesPanel._container),
+    var callableElementRefInput = domQuery('input[name=callableElementRef]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     // given
-    expect(caseRefInput.value).to.equal('checkCreditCase');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(callableElementRefInput.value).to.equal('checkCreditCase');
+    expect(businessObject.get('camunda:caseRef')).to.equal(callableElementRefInput.value);
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
 
     // when
-    TestHelper.triggerValue(caseRefInput, 'myCase', 'change');
+    TestHelper.triggerValue(callableElementRefInput, 'myCase', 'change');
 
     // then
-    expect(caseRefInput.value).to.equal('myCase');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
+    expect(callableElementRefInput.value).to.equal('myCase');
+    expect(businessObject.get('camunda:caseRef')).to.equal(callableElementRefInput.value);
     expect(businessObject.get('camunda:caseBinding')).to.equal('latest'); // default value
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
 
@@ -312,33 +330,33 @@ describe('call-activity-properties', function() {
     var shape = elementRegistry.get('CallActivity_3');
     selection.select(shape);
 
-    var caseRefInput = domQuery('input[name=caseRef]', propertiesPanel._container),
-        caseBindingSelect = domQuery('select[name=caseBinding]', propertiesPanel._container),
-        versionInput = domQuery('input[name=caseVersion]', propertiesPanel._container),
+    var callableElementRefInput = domQuery('input[name=callableElementRef]', propertiesPanel._container),
+        callableBindingSelect = domQuery('select[name=callableBinding]', propertiesPanel._container),
+        versionInput = domQuery('input[name=callableVersion]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     // given
     expect(callActivityTypeSelect.value).to.equal('cmmn');
-    expect(caseRefInput.value).to.equal('checkCreditCase');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(callableElementRefInput.value).to.equal('checkCreditCase');
+    expect(businessObject.get('camunda:caseRef')).to.equal(callableElementRefInput.value);
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');;
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
 
     // when
     // select 'version'
-    caseBindingSelect.options[2].selected = 'selected';
-    TestHelper.triggerEvent(caseBindingSelect, 'change');
+    callableBindingSelect.options[2].selected = 'selected';
+    TestHelper.triggerEvent(callableBindingSelect, 'change');
 
     TestHelper.triggerValue(versionInput, '24', 'change');
 
     // then
     expect(callActivityTypeSelect.value).to.equal('cmmn');
-    expect(caseRefInput.value).to.equal('checkCreditCase');
-    expect(caseBindingSelect.value).to.equal('version');
+    expect(callableElementRefInput.value).to.equal('checkCreditCase');
+    expect(callableBindingSelect.value).to.equal('version');
     expect(versionInput.value).to.equal('24');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
-    expect(businessObject.get('camunda:caseBinding')).to.equal(caseBindingSelect.value);
+    expect(businessObject.get('camunda:caseRef')).to.equal(callableElementRefInput.value);
+    expect(businessObject.get('camunda:caseBinding')).to.equal(callableBindingSelect.value);
     expect(businessObject.get('camunda:caseVersion')).to.equal(versionInput.value);
 
   }));
@@ -351,22 +369,20 @@ describe('call-activity-properties', function() {
 
     selection.select(shape);
 
-    var caseRefInput = domQuery('input[name=caseRef]', propertiesPanel._container),
-        caseBindingSelect = domQuery('select[name=caseBinding]', propertiesPanel._container),
-        versionInput = domQuery('input[name=caseVersion]', propertiesPanel._container),
+    var callableElementRefInput = domQuery('input[name=callableElementRef]', propertiesPanel._container),
+        callableBindingSelect = domQuery('select[name=callableBinding]', propertiesPanel._container),
+        versionInput = domQuery('input[name=callableVersion]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
-        clearButton = domQuery(
-          '[data-entry=callActivity] > div > .pp-row > .pp-field-wrapper > button[data-action=caseRef\\.clearVersion]',
-          propertiesPanel._container),
+        clearButton = domQuery('[data-entry=callable-version] button[data-action=clear]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     // given
     expect(callActivityTypeSelect.value).to.equal('cmmn');
-    expect(caseRefInput.value).to.equal('checkCreditCase');
-    expect(caseBindingSelect.value).to.equal('version');
+    expect(callableElementRefInput.value).to.equal('checkCreditCase');
+    expect(callableBindingSelect.value).to.equal('version');
     expect(versionInput.value).to.equal('17');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
-    expect(businessObject.get('camunda:caseBinding')).to.equal(caseBindingSelect.value);
+    expect(businessObject.get('camunda:caseRef')).to.equal(callableElementRefInput.value);
+    expect(businessObject.get('camunda:caseBinding')).to.equal(callableBindingSelect.value);
     expect(businessObject.get('camunda:caseVersion')).to.equal(parseInt(versionInput.value));
 
     // when
@@ -374,12 +390,12 @@ describe('call-activity-properties', function() {
 
     // then
     expect(callActivityTypeSelect.value).to.equal('cmmn');
-    expect(caseRefInput.value).to.equal('checkCreditCase');
-    expect(caseBindingSelect.value).to.equal('version');
+    expect(callableElementRefInput.value).to.equal('checkCreditCase');
+    expect(callableBindingSelect.value).to.equal('version');
     expect(versionInput.value).to.be.empty;
     expect(versionInput.className).to.equal('invalid');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
-    expect(businessObject.get('camunda:caseBinding')).to.equal(caseBindingSelect.value);
+    expect(businessObject.get('camunda:caseRef')).to.equal(callableElementRefInput.value);
+    expect(businessObject.get('camunda:caseBinding')).to.equal(callableBindingSelect.value);
     expect(businessObject.get('camunda:caseVersion')).to.be.empty;
   }));
 
@@ -391,25 +407,22 @@ describe('call-activity-properties', function() {
 
     selection.select(shape);
 
-    var caseRefInput = domQuery('input[name=caseRef]', propertiesPanel._container),
-        caseBindingSelect = domQuery('select[name=caseBinding]', propertiesPanel._container),
-        caseVersionInput = domQuery('input[name=caseVersion]', propertiesPanel._container),
-        calledElementInput = domQuery('input[name=calledElement]', propertiesPanel._container),
-        calledElementBindingSelect = domQuery('select[name=calledElementBinding]', propertiesPanel._container),
-        calledElementVersionInput = domQuery('input[name=calledElementVersion]', propertiesPanel._container),
+    var callableElementRefInput = domQuery('input[name=callableElementRef]', propertiesPanel._container),
+        callableBindingSelect = domQuery('select[name=callableBinding]', propertiesPanel._container),
+        callableVersionInput = domQuery('input[name=callableVersion]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     // given
     expect(callActivityTypeSelect.value).to.equal('bpmn');
-    expect(calledElementInput.value).to.equal('asd');
-    expect(calledElementBindingSelect.value).to.equal('version');
-    expect(calledElementVersionInput.value).to.equal('17');
-    expect(businessObject.get('calledElement')).to.equal(calledElementInput.value);
-    expect(businessObject.get('camunda:calledElementBinding')).to.equal(calledElementBindingSelect.value);
-    expect(businessObject.get('camunda:calledElementVersion')).to.equal(parseInt(calledElementVersionInput.value));
+    expect(callableElementRefInput.value).to.equal('asd');
+    expect(callableBindingSelect.value).to.equal('version');
+    expect(callableVersionInput.value).to.equal('17');
+    expect(businessObject.get('calledElement')).to.equal(callableElementRefInput.value);
+    expect(businessObject.get('camunda:calledElementBinding')).to.equal(callableBindingSelect.value);
+    expect(businessObject.get('camunda:calledElementVersion')).to.equal(parseInt(callableVersionInput.value));
     expect(businessObject.get('camunda:caseRef')).not.to.exist;
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');;
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
 
     // when
@@ -417,18 +430,18 @@ describe('call-activity-properties', function() {
     callActivityTypeSelect.options[1].selected = 'selected';
     TestHelper.triggerEvent(callActivityTypeSelect, 'change');
 
-    TestHelper.triggerValue(caseRefInput, 'myCase', 'change');
+    TestHelper.triggerValue(callableElementRefInput, 'myCase', 'change');
 
     // then
     expect(callActivityTypeSelect.value).to.equal('cmmn');
-    expect(caseRefInput.value).to.equal('myCase');
-    expect(caseBindingSelect.value).to.equal('latest');
-    expect(caseVersionInput.parentElement.parentElement.className).to.contains('pp-hidden');
-    expect(businessObject.get('camunda:caseRef')).to.equal(caseRefInput.value);
-    expect(businessObject.get('camunda:caseBinding')).to.equal(caseBindingSelect.value);
+    expect(callableElementRefInput.value).to.equal('myCase');
+    expect(callableBindingSelect.value).to.equal('latest');
+    expect(callableVersionInput.parentElement.className).to.contains('pp-hidden');
+    expect(businessObject.get('camunda:caseRef')).to.equal(callableElementRefInput.value);
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');;
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
     expect(businessObject.get('calledElement')).not.to.exist;
-    expect(businessObject.get('camunda:calledElementBinding')).not.to.exist;
+    expect(businessObject.get('camunda:calledElementBinding')).to.equal('latest');
     expect(businessObject.get('camunda:calledElementVersion')).not.to.exist;
 
   }));
@@ -441,19 +454,21 @@ describe('call-activity-properties', function() {
 
     selection.select(shape);
 
-    var bpmnArea = domQuery('[data-show=isBPMN]', propertiesPanel._container),
-        cmmnArea = domQuery('[data-show=isCMMN]', propertiesPanel._container),
+    var callableElementRefInput = domQuery('input[name=callableElementRef]', propertiesPanel._container),
+        callableBindingSelect = domQuery('select[name=callableBinding]', propertiesPanel._container),
+        callableVersionInput = domQuery('input[name=callableVersion]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     expect(callActivityTypeSelect.value).to.equal('');
-    expect(bpmnArea.className).to.contains('pp-hidden');
-    expect(cmmnArea.className).to.contains('pp-hidden');
+    expect(callableElementRefInput.parentElement.className).to.contains('pp-hidden');
+    expect(callableBindingSelect.className).to.contains('pp-hidden');
+    expect(callableVersionInput.parentElement.className).to.contains('pp-hidden');
     expect(businessObject.get('calledElement')).not.to.exist;
     expect(businessObject.get('camunda:calledElementBinding')).to.equal('latest'); // default value
     expect(businessObject.get('camunda:calledElementVersion')).not.to.exist;
     expect(businessObject.get('camunda:caseRef')).not.to.exist;
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
   }));
 
@@ -464,27 +479,26 @@ describe('call-activity-properties', function() {
 
     selection.select(shape);
 
-    var caseBindingSelect = domQuery('select[name=caseBinding]', propertiesPanel._container),
-        caseVersionInput = domQuery('input[name=caseVersion]', propertiesPanel._container),
-        calledElementBindingSelect = domQuery('select[name=calledElementBinding]', propertiesPanel._container),
-        calledElementVersionInput = domQuery('input[name=calledElementVersion]', propertiesPanel._container),
+    var callableBindingSelect = domQuery('select[name=callableBinding]', propertiesPanel._container),
+        callableVersionInput = domQuery('input[name=callableVersion]', propertiesPanel._container),
+        callableElementRefInput = domQuery('select[name=callableElementRefInput]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     // given
     expect(callActivityTypeSelect.value).to.equal('bpmn');
 
-    expect(calledElementBindingSelect.value).to.equal('latest');
+    expect(callableBindingSelect.value).to.equal('latest');
 
     expect(businessObject.get('camunda:calledElementBinding')).to.equal('latest'); // default value in camunda-moddle
 
     expect(businessObject.get('camunda:caseRef')).not.to.exist;
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
 
     // when change called element binding to 'version'
-    calledElementBindingSelect.options[2].selected = 'selected';
-    TestHelper.triggerEvent(calledElementBindingSelect, 'change');
+    callableBindingSelect.options[2].selected = 'selected';
+    TestHelper.triggerEvent(callableBindingSelect, 'change');
 
     // and when change call activity type to 'cmmn'
     callActivityTypeSelect.options[1].selected = 'selected';
@@ -493,8 +507,8 @@ describe('call-activity-properties', function() {
     // then
     expect(callActivityTypeSelect.value).to.equal('cmmn');
 
-    expect(caseBindingSelect.value).to.equal('latest');
-    expect(caseVersionInput.parentElement.parentElement.className).to.contains('pp-hidden');
+    expect(callableBindingSelect.value).to.equal('latest');
+    expect(callableVersionInput.parentElement.className).to.contains('pp-hidden');
 
     // when change back to 'bpmn'
     callActivityTypeSelect.options[0].selected = 'selected';
@@ -503,15 +517,15 @@ describe('call-activity-properties', function() {
     // then
     expect(callActivityTypeSelect.value).to.equal('bpmn');
 
-    expect(calledElementBindingSelect.value).to.equal('latest');
-    expect(calledElementVersionInput.parentElement.parentElement.className).to.contains('pp-hidden');
+    expect(callableBindingSelect.value).to.equal('latest');
+    expect(callableVersionInput.parentElement.className).to.contains('pp-hidden');
 
     // property 'camunda:calledElementBinding' should not exist in the business object,
     // because there is the default value 'latest'
-    expect(businessObject.get('camunda:calledElementBinding')).not.to.exist;
+    expect(businessObject.get('camunda:calledElementBinding')).to.equal('latest');
     expect(businessObject.get('camunda:calledElementVersion')).not.to.exist;
 
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
 
   }));
@@ -523,27 +537,25 @@ describe('call-activity-properties', function() {
 
     selection.select(shape);
 
-    var caseBindingSelect = domQuery('select[name=caseBinding]', propertiesPanel._container),
-        caseVersionInput = domQuery('input[name=caseVersion]', propertiesPanel._container),
-        calledElementBindingSelect = domQuery('select[name=calledElementBinding]', propertiesPanel._container),
-        calledElementVersionInput = domQuery('input[name=calledElementVersion]', propertiesPanel._container),
+    var callableBindingSelect = domQuery('select[name=callableBinding]', propertiesPanel._container),
+        callableVersionInput = domQuery('input[name=callableVersion]', propertiesPanel._container),
         callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
         businessObject = getBusinessObject(shape);
 
     // given
     expect(callActivityTypeSelect.value).to.equal('cmmn');
 
-    expect(caseBindingSelect.value).to.equal('latest');
+    expect(callableBindingSelect.value).to.equal('latest');
 
-    expect(businessObject.get('camunda:caseBinding')).to.not.exist;
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');;
 
     expect(businessObject.get('camunda:calledElement')).not.to.exist;
     expect(businessObject.get('camunda:calledElementBinding')).to.equal('latest'); // default value in the camunda-moddle
     expect(businessObject.get('camunda:calledElementVersion')).not.to.exist;
 
     // when change case binding to 'version'
-    caseBindingSelect.options[2].selected = 'selected';
-    TestHelper.triggerEvent(caseBindingSelect, 'change');
+    callableBindingSelect.options[2].selected = 'selected';
+    TestHelper.triggerEvent(callableBindingSelect, 'change');
 
     // and when change call activity type to 'bpmn'
     callActivityTypeSelect.options[0].selected = 'selected';
@@ -552,8 +564,8 @@ describe('call-activity-properties', function() {
     // then
     expect(callActivityTypeSelect.value).to.equal('bpmn');
 
-    expect(calledElementBindingSelect.value).to.equal('latest');
-    expect(calledElementVersionInput.parentElement.parentElement.className).to.contains('pp-hidden');
+    expect(callableBindingSelect.value).to.equal('latest');
+    expect(callableVersionInput.parentElement.className).to.contains('pp-hidden');
 
     // when change back to 'cmmn'
     callActivityTypeSelect.options[1].selected = 'selected';
@@ -562,15 +574,215 @@ describe('call-activity-properties', function() {
     // then
     expect(callActivityTypeSelect.value).to.equal('cmmn');
 
-    expect(caseBindingSelect.value).to.equal('latest');
-    expect(caseVersionInput.parentElement.parentElement.className).to.contains('pp-hidden');
+    expect(callableBindingSelect.value).to.equal('latest');
+    expect(callableVersionInput.parentElement.className).to.contains('pp-hidden');
 
-    expect(businessObject.get('camunda:calledElementBinding')).not.to.exist;
+    expect(businessObject.get('camunda:calledElementBinding')).to.equal('latest');
     expect(businessObject.get('camunda:calledElementVersion')).not.to.exist;
 
     expect(businessObject.get('camunda:caseRef')).to.be.empty;
-    expect(businessObject.get('camunda:caseBinding')).not.to.exist;
+    expect(businessObject.get('camunda:caseBinding')).to.equal('latest');;
     expect(businessObject.get('camunda:caseVersion')).not.to.exist;
+
+  }));
+
+
+  it('should fetch the business key for a bpmn call activity',
+      inject(function(propertiesPanel, selection, elementRegistry) {
+
+    var shape = elementRegistry.get('CallActivity_6');
+
+    selection.select(shape);
+
+    var checkBox = domQuery('input[name=callableBusinessKey]', propertiesPanel._container),
+        callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
+        businessObject = getBusinessObject(shape);
+
+    // given
+    expect(callActivityTypeSelect.value).to.equal('bpmn');
+    expect(checkBox.checked).to.be.true;
+  }));
+
+
+  it('should set the business key for an element',
+      inject(function(propertiesPanel, selection, elementRegistry) {
+
+    var shape = elementRegistry.get('CallActivity_2');
+
+    selection.select(shape);
+
+    var checkBox = domQuery('input[name=callableBusinessKey]', propertiesPanel._container),
+        callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
+        businessObject = getBusinessObject(shape);
+
+    // given
+    expect(callActivityTypeSelect.value).to.equal('bpmn');
+    expect(checkBox.checked).to.be.false;
+    expect(businessObject.extensionElements).to.be.undefined;
+
+    // when
+    TestHelper.triggerEvent(checkBox, 'click');
+
+    // then
+    expect(checkBox.checked).to.be.true;
+
+    var camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn[0].businessKey).to.equal('#{execution.processBusinessKey}');
+  }));
+
+
+  it('should remove the business key for an element',
+      inject(function(propertiesPanel, selection, elementRegistry) {
+
+    var shape = elementRegistry.get('CallActivity_6');
+
+    selection.select(shape);
+
+    var checkBox = domQuery('input[name=callableBusinessKey]', propertiesPanel._container),
+        callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
+        businessObject = getBusinessObject(shape);
+
+    // given
+    expect(callActivityTypeSelect.value).to.equal('bpmn');
+    expect(checkBox.checked).to.be.true;
+
+    var camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn[0].businessKey).to.equal('#{execution.processBusinessKey}');
+
+    // when
+    TestHelper.triggerEvent(checkBox, 'click');
+
+    // then
+    expect(checkBox.checked).to.be.false;
+
+    camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(0);
+
+  }));
+
+
+  it('should fetch the business key for a CMMN call activity',
+      inject(function(propertiesPanel, selection, elementRegistry) {
+
+    var shape = elementRegistry.get('CallActivity_7');
+
+    selection.select(shape);
+
+    var checkBox = domQuery('input[name=callableBusinessKey]', propertiesPanel._container),
+        callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
+        businessObject = getBusinessObject(shape);
+
+    // given
+    expect(callActivityTypeSelect.value).to.equal('cmmn');
+    expect(checkBox.checked).to.be.true;
+  }));
+
+
+  it('should remove the business key for a CMMN call activity',
+      inject(function(propertiesPanel, selection, elementRegistry) {
+
+    var shape = elementRegistry.get('CallActivity_7');
+
+    selection.select(shape);
+
+    var checkBox = domQuery('input[name=callableBusinessKey]', propertiesPanel._container),
+        callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
+        businessObject = getBusinessObject(shape);
+
+    // given
+    expect(callActivityTypeSelect.value).to.equal('cmmn');
+    expect(checkBox.checked).to.be.true;
+
+    var camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(3);
+
+    // when
+    TestHelper.triggerEvent(checkBox, 'click');
+
+    // then
+    expect(checkBox.checked).to.be.false;
+
+    camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(0);
+
+  }));
+
+
+  it('should undo to remove the business key for a CMMN call activity',
+      inject(function(propertiesPanel, selection, elementRegistry, commandStack) {
+
+    var shape = elementRegistry.get('CallActivity_7');
+
+    selection.select(shape);
+
+    var checkBox = domQuery('input[name=callableBusinessKey]', propertiesPanel._container),
+        callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
+        businessObject = getBusinessObject(shape);
+
+    // given
+    expect(callActivityTypeSelect.value).to.equal('cmmn');
+    expect(checkBox.checked).to.be.true;
+
+    var camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(3);
+
+    // when
+    TestHelper.triggerEvent(checkBox, 'click');
+
+    // then
+    expect(checkBox.checked).to.be.false;
+
+    camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(0);
+
+    // undo
+    commandStack.undo();
+
+    // then 
+    expect(checkBox.checked).to.be.true;
+
+    var camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(3);
+
+  }));
+
+
+  it('should redo to remove the business key for a CMMN call activity',
+      inject(function(propertiesPanel, selection, elementRegistry, commandStack) {
+
+    var shape = elementRegistry.get('CallActivity_7');
+
+    selection.select(shape);
+
+    var checkBox = domQuery('input[name=callableBusinessKey]', propertiesPanel._container),
+        callActivityTypeSelect = domQuery('select[name=callActivityType]', propertiesPanel._container),
+        businessObject = getBusinessObject(shape);
+
+    // given
+    expect(callActivityTypeSelect.value).to.equal('cmmn');
+    expect(checkBox.checked).to.be.true;
+
+    var camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(3);
+
+    // when
+    TestHelper.triggerEvent(checkBox, 'click');
+
+    // then
+    expect(checkBox.checked).to.be.false;
+
+    camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(0);
+
+    // undo
+    commandStack.undo();
+    commandStack.redo();
+
+    // then
+    expect(checkBox.checked).to.be.false;
+
+    camundaIn = getCamundaInWithBusinessKey(businessObject.extensionElements);
+    expect(camundaIn).to.have.length.of(0);
 
   }));
 

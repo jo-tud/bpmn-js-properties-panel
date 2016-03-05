@@ -2,12 +2,12 @@
 @import "./_mixins";
 
 @font-face {
-  font-family: 'bpmn-io-pp';
+  font-family: 'bpmn-js-pp';
   src: url(@font-eot);
   src: url(@font-eot) format('embedded-opentype'),
        url(@font-woff) format('woff'),
        url(@font-ttf) format('truetype'),
-       url(@font-svg) format('svg');
+       url(@pp-font-svg) format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -31,7 +31,7 @@
   button,
   textarea {
     padding: 3px 6px;
-    border: 1px solid @gray-light;
+    border: 1px solid @pp-color-gray-light;
 
     &:focus {
       .focus();
@@ -40,7 +40,7 @@
     &.invalid {
       .invalid();
       &:focus {
-        box-shadow: 0 0 1px 2px fade(@error-color, 20%);
+        box-shadow: 0 0 1px 2px fade(@pp-color-error, 20%);
       }
     }
   }
@@ -53,7 +53,6 @@
   }
 
   textarea {
-    min-height: 45px;
     resize: vertical;
   }
 
@@ -61,13 +60,30 @@
     .label();
   }
 
+  .entry-label {
+    .label();
+    font-size: 120%;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    transition: margin 0.218s linear;
+    font-style: italic;
+
+    &.divider {
+      border-top: 1px dotted #ccc;
+      padding-top: 8px;
+      margin-top: 16px;
+      width: 100%;
+    }
+  }
+
   button {
     .action-button();
   }
 }
 
-.pp-error-message {
-  color: @error-color;
+.pp-error-message,
+.pp-error-message.pp-entry-link {
+  color: @pp-color-error;
 }
 
 .pp-row {
@@ -132,6 +148,10 @@
   }
 }
 
+.pp-combo-input {
+  margin-top: 7px;
+}
+
 .pp-select {
   select {
     height: 23px;
@@ -139,6 +159,26 @@
   button.add {
     top: -22px;
     right: 0;
+  }
+}
+
+.pp-select,
+.pp-element-list {
+
+  button {
+    &.add,
+    &.clear {
+      top: -23px;
+      border-bottom: none;
+    }
+  }
+
+  button.add {
+    right: 0px;
+  }
+
+  button.clear {
+    right: 23px;
   }
 }
 
@@ -157,15 +197,75 @@ label.pp-hidden {
   .pp-hidden;
 }
 
+.pp-table-add-row {
+  > button {
+    position: relative;
+    margin-left: 10px;
+  }
+}
+
+.pp-table {
+  margin-top: 10px;
+}
+
+.pp-table-row {
+  margin-bottom: 2px;
+  overflow: hidden;
+
+  > input,
+  > button {
+    float: left;
+  }
+
+  > label {
+    padding-left: 5px;
+  }
+
+  > label,
+  > input {
+
+    &.pp-table-row-columns-1 {
+      width: 100%;
+      &.pp-table-row-removable {
+        width: ~"calc(100% - 24px)";
+      }
+    }
+
+    &.pp-table-row-columns-2 {
+      width: 50%;
+      &.pp-table-row-removable {
+        width: ~"calc(50% - 12px)";
+      }
+      &:nth-child(2) {
+        border-left: none;
+      }
+    }
+  }
+
+  > button {
+    border-left: none;
+    position: static;
+  }
+}
 
 .djs-properties-static {
   margin-bottom: 0;
   margin-top: 0;
-  border: 1px solid @gray-light;
+  border: 1px solid @pp-color-gray-light;
   background-color: white;
   padding: 3px 6px;
   font: 13.3333px Arial;
   width: 100%;
+}
+
+.pp-entry-link {
+  cursor: pointer;
+  color: @pp-color-primary;
+}
+
+.pp-icon-warning:before {
+  .icon-font();
+  content: '\E806';
 }
 
 @import "./header";

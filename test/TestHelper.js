@@ -2,9 +2,11 @@
 
 var TestHelper = module.exports = require('bpmn-js/test/helper');
 
+var domQuery = require('min-dom/lib/query');
+
 TestHelper.insertCSS('diagram-js.css', require('diagram-js/assets/diagram-js.css'));
 TestHelper.insertCSS('bpmn-embedded.css', require('bpmn-js/assets/bpmn-font/css/bpmn-embedded.css'));
-TestHelper.insertCSS('properties.css', require('../assets/properties.css'));
+TestHelper.insertCSS('properties.css', require('./assets/properties.css'));
 
 TestHelper.insertCSS('diagram-js-testing.css',
   '.test-container .result { height: auto; }' +
@@ -12,7 +14,38 @@ TestHelper.insertCSS('diagram-js-testing.css',
   ' div.test-container {height: auto}'
 );
 
-var domQuery = require('min-dom/lib/query');
+
+var bootstrapModeler = TestHelper.bootstrapModeler;
+
+/**
+ * Bootstrap a modeler instance.
+ *
+ * Before a modeler instance is bootstrapped any previous
+ * existing modeler instance is destroyed, if it exists.
+ *
+ * Due to the fact that (almost) each test case bootstrap a new
+ * modeler instance, destroying of an previous modeler instance
+ * is necessary to speed the test execution up.
+ */
+TestHelper.bootstrapModeler = function(diagram, options, locals) {
+  return function(done) {
+    var previousInstance = TestHelper.getBpmnJS();
+
+    if (previousInstance) {
+      var container = previousInstance.container.parentNode;
+
+      container.parentNode.removeChild(container);
+
+      previousInstance.destroy();
+    }
+    return bootstrapModeler(diagram, options, locals).apply(this, [ done ]);
+  };
+};
+
+/**
+ * Overwrites the existing global bootstrapModeler().
+ */
+global.bootstrapModeler = TestHelper.bootstrapModeler;
 
 /**
  * Triggers a change event
@@ -60,6 +93,19 @@ var triggerInput = function(element, value) {
 };
 
 /**
+ * Select a form field with the specified index in the DOM
+ *
+ * @param  {number} index
+ * @param  {DOMElement} container
+ */
+var triggerFormFieldSelection = function(index, container) {
+  var formFieldSelectBox = domQuery('select[name=selectedExtensionElement]', container);
+
+  formFieldSelectBox.options[index].selected = 'selected';
+  TestHelper.triggerEvent(formFieldSelectBox, 'change');
+};
+
+/**
  *  Select the option with the given value
  *
  *  @param element contains the options
@@ -97,5 +143,6 @@ var selectedByIndex = function(element) {
 module.exports.triggerEvent = triggerEvent;
 module.exports.triggerValue = triggerValue;
 module.exports.triggerInput = triggerInput;
+module.exports.triggerFormFieldSelection = triggerFormFieldSelection;
 module.exports.selectedByOption = selectedByOption;
 module.exports.selectedByIndex = selectedByIndex;
