@@ -55,8 +55,7 @@
     "lodash": "^3.0.1",
     "min-dom": "^0.2.0",
     "scroll-tabs": "^0.2.1",
-    "selection-update": "^0.1.2",
-    "bpmn-js-aof": "korbinianHoerfurter/bpmn-js-aof"
+    "selection-update": "^0.1.2"
   },
   "peerDependencies": {
     "bpmn-js": ">=0.12 <0.14",
